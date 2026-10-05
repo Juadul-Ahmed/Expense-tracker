@@ -24,7 +24,7 @@ import ExpenseForm from "@/components/ExpenseForm";
 import ExpenseList from "@/components/ExpenseList";
 import EditExpenseModal from "@/components/EditExpenseModal";
 import ExpenseChart from "@/components/ExpenseChart";
-
+import ExpenseFilters from "@/components/ExpenseFilters";
 import { Expense } from "@/types/expense";
 
 export default function Home() {
@@ -35,6 +35,12 @@ export default function Home() {
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const [categoryFilter, setCategoryFilter] = useState<
+    "All" | Expense["category"]
+  >("All");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   // Load expenses from MongoDB when the page opens
   useEffect(() => {
@@ -53,30 +59,27 @@ export default function Home() {
 
   // Add expense
   const handleAddExpense = async (expense: Expense) => {
-  try {
-    const { id, ...expenseData } = expense;
+    try {
+      const { id, ...expenseData } = expense;
 
-    const createdExpense = await createExpense(expenseData);
+      const createdExpense = await createExpense(expenseData);
 
-    dispatch(addExpense(createdExpense));
-  } catch (error) {
-    console.error("Failed to add expense:", error);
-  }
-};
+      dispatch(addExpense(createdExpense));
+    } catch (error) {
+      console.error("Failed to add expense:", error);
+    }
+  };
 
   // Delete expense
   const handleDeleteExpense = async (id: string) => {
-  try {
-    await deleteExpenseApi(id);
+    try {
+      await deleteExpenseApi(id);
 
-    dispatch(deleteExpense(id));
-  } catch (error) {
-    console.error(
-      "Failed to delete expense:",
-      error
-    );
-  }
-};
+      dispatch(deleteExpense(id));
+    } catch (error) {
+      console.error("Failed to delete expense:", error);
+    }
+  };
 
   // Start editing
   const handleEditExpense = (expense: Expense) => {
@@ -85,31 +88,35 @@ export default function Home() {
   };
 
   // Update expense
-  const handleUpdateExpense = async (
-  updatedExpense: Expense
-) => {
-  try {
-    const updated = await updateExpenseApi(
-      updatedExpense
-    );
+  const handleUpdateExpense = async (updatedExpense: Expense) => {
+    try {
+      const updated = await updateExpenseApi(updatedExpense);
 
-    dispatch(updateExpense(updated));
+      dispatch(updateExpense(updated));
 
-    setEditingExpense(null);
-    setIsEditModalOpen(false);
-  } catch (error) {
-    console.error(
-      "Failed to update expense:",
-      error
-    );
-  }
-};
+      setEditingExpense(null);
+      setIsEditModalOpen(false);
+    } catch (error) {
+      console.error("Failed to update expense:", error);
+    }
+  };
 
   // Calculate total
   const totalExpense = expenses.reduce(
     (total, expense) => total + expense.amount,
     0,
   );
+
+  const filteredExpenses = expenses.filter((expense) => {
+    const matchesCategory =
+      categoryFilter === "All" || expense.category === categoryFilter;
+
+    const matchesStartDate = !startDate || expense.date >= startDate;
+
+    const matchesEndDate = !endDate || expense.date <= endDate;
+
+    return matchesCategory && matchesStartDate && matchesEndDate;
+  });
 
   return (
     <main className="min-h-screen bg-gray-100 px-4 py-8">
@@ -126,6 +133,14 @@ export default function Home() {
 
         <ExpenseChart expenses={expenses} />
 
+        <ExpenseFilters
+          categoryFilter={categoryFilter}
+          onCategoryChange={setCategoryFilter}
+          startDate={startDate}
+          endDate={endDate}
+          onStartDateChange={setStartDate}
+          onEndDateChange={setEndDate}
+        />
         <EditExpenseModal
           isOpen={isEditModalOpen}
           expense={editingExpense}
@@ -135,7 +150,7 @@ export default function Home() {
         />
 
         <ExpenseList
-          expenses={expenses}
+          expenses={filteredExpenses}
           onEdit={handleEditExpense}
           onDelete={handleDeleteExpense}
         />
