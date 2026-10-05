@@ -1,31 +1,82 @@
 "use client";
 
-import { useState } from "react";
-import { addExpense, updateExpense, deleteExpense } from "@/store/expenseSlice";
+import { useEffect, useState } from "react";
+
+import {
+  loadExpenses,
+  addExpense,
+  updateExpense,
+  deleteExpense,
+} from "@/store/expenseSlice";
+
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
+
+import {
+  getExpenses,
+  createExpense,
+  updateExpense as updateExpenseApi,
+  deleteExpense as deleteExpenseApi,
+} from "@/lib/api";
+
 import Header from "@/components/Header";
 import TotalExpense from "@/components/TotalExpense";
 import ExpenseForm from "@/components/ExpenseForm";
 import ExpenseList from "@/components/ExpenseList";
 import EditExpenseModal from "@/components/EditExpenseModal";
-import { Expense } from "@/types/expense";
 import ExpenseChart from "@/components/ExpenseChart";
+
+import { Expense } from "@/types/expense";
 
 export default function Home() {
   const dispatch = useAppDispatch();
 
   const expenses = useAppSelector((state) => state.expenses.expenses);
+
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  // Load expenses from MongoDB when the page opens
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const data = await getExpenses();
+
+        dispatch(loadExpenses(data));
+      } catch (error) {
+        console.error("Failed to load expenses:", error);
+      }
+    }
+
+    loadData();
+  }, [dispatch]);
+
   // Add expense
-  const handleAddExpense = (expense: Expense) => {
-    dispatch(addExpense(expense));
-  };
+  const handleAddExpense = async (expense: Expense) => {
+  try {
+    const { id, ...expenseData } = expense;
+
+    const createdExpense = await createExpense(expenseData);
+
+    dispatch(addExpense(createdExpense));
+  } catch (error) {
+    console.error("Failed to add expense:", error);
+  }
+};
 
   // Delete expense
-  const handleDeleteExpense = (id: string) => {
+  const handleDeleteExpense = async (id: string) => {
+  try {
+    await deleteExpenseApi(id);
+
     dispatch(deleteExpense(id));
-  };
+  } catch (error) {
+    console.error(
+      "Failed to delete expense:",
+      error
+    );
+  }
+};
 
   // Start editing
   const handleEditExpense = (expense: Expense) => {
@@ -34,12 +85,25 @@ export default function Home() {
   };
 
   // Update expense
-  const handleUpdateExpense = (updatedExpense: Expense) => {
-    dispatch(updateExpense(updatedExpense));
+  const handleUpdateExpense = async (
+  updatedExpense: Expense
+) => {
+  try {
+    const updated = await updateExpenseApi(
+      updatedExpense
+    );
+
+    dispatch(updateExpense(updated));
 
     setEditingExpense(null);
     setIsEditModalOpen(false);
-  };
+  } catch (error) {
+    console.error(
+      "Failed to update expense:",
+      error
+    );
+  }
+};
 
   // Calculate total
   const totalExpense = expenses.reduce(
@@ -59,6 +123,7 @@ export default function Home() {
           onUpdateExpense={handleUpdateExpense}
           editingExpense={null}
         />
+
         <ExpenseChart expenses={expenses} />
 
         <EditExpenseModal
