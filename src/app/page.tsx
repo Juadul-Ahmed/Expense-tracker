@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import type { RootState, AppDispatch } from "@/store/store";
 import { addExpense, updateExpense, deleteExpense } from "@/store/expenseSlice";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import Header from "@/components/Header";
 import TotalExpense from "@/components/TotalExpense";
 import ExpenseForm from "@/components/ExpenseForm";
@@ -13,9 +12,9 @@ import { Expense } from "@/types/expense";
 import ExpenseChart from "@/components/ExpenseChart";
 
 export default function Home() {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
 
-  const expenses = useSelector((state: RootState) => state.expenses.expenses);
+  const expenses = useAppSelector((state) => state.expenses.expenses);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   // Add expense
