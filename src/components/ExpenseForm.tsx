@@ -31,11 +31,17 @@ export default function ExpenseForm({
 }: ExpenseFormProps) {
   const [title, setTitle] = useState(editingExpense?.title ?? "");
 
-  const [amount, setAmount] = useState(editingExpense?.amount.toString() ?? "");
+  const [amount, setAmount] = useState(
+    editingExpense?.amount.toString() ?? ""
+  );
 
-  const [category, setCategory] = useState(editingExpense?.category ?? "");
+  const [category, setCategory] = useState(
+    editingExpense?.category ?? ""
+  );
 
-  const [date, setDate] = useState(editingExpense?.date ?? "");
+  const [date, setDate] = useState(
+    editingExpense?.date ?? ""
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,7 +52,9 @@ export default function ExpenseForm({
     }
 
     const expenseData: Expense = {
-      id: editingExpense ? editingExpense.id : crypto.randomUUID(),
+      id: editingExpense
+        ? editingExpense.id
+        : crypto.randomUUID(),
       title,
       amount: Number(amount),
       category: category as Expense["category"],
@@ -68,7 +76,9 @@ export default function ExpenseForm({
   return (
     <div
       className={
-        variant === "card" ? "mb-8 rounded-xl bg-white p-6 shadow-sm" : ""
+        variant === "card"
+          ? "mb-8 rounded-xl bg-white p-6 shadow-sm"
+          : ""
       }
     >
       {variant === "card" && (
@@ -80,21 +90,30 @@ export default function ExpenseForm({
       <form
         id={formId}
         onSubmit={handleSubmit}
-        className="grid gap-5 md:grid-cols-2"
+        className="grid grid-cols-1 gap-5 md:grid-cols-2"
       >
         {/* Title */}
-        <TextField name="title" isRequired className="w-full">
+        <TextField
+          name="title"
+          isRequired
+          className="w-full min-w-0"
+        >
           <Label>Title</Label>
 
           <Input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="e.g. Lunch"
+            className="w-full min-w-0"
           />
         </TextField>
 
         {/* Amount */}
-        <TextField name="amount" isRequired className="w-full">
+        <TextField
+          name="amount"
+          isRequired
+          className="w-full min-w-0"
+        >
           <Label>Amount</Label>
 
           <Input
@@ -104,6 +123,7 @@ export default function ExpenseForm({
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             placeholder="e.g. 50"
+            className="w-full min-w-0"
           />
         </TextField>
 
@@ -111,13 +131,15 @@ export default function ExpenseForm({
         <Select
           name="category"
           value={category || null}
-          onChange={(value) => setCategory(value?.toString() ?? "")}
+          onChange={(value) =>
+            setCategory(value?.toString() ?? "")
+          }
           isRequired
-          className="w-full"
+          className="w-full min-w-0"
         >
           <Label>Category</Label>
 
-          <Select.Trigger>
+          <Select.Trigger className="w-full">
             <Select.Value />
             <Select.Indicator />
           </Select.Trigger>
@@ -148,20 +170,27 @@ export default function ExpenseForm({
         </Select>
 
         {/* Date */}
-        <TextField name="date" isRequired className="w-full">
+        <TextField
+          name="date"
+          isRequired
+          className="w-full min-w-0"
+        >
           <Label>Date</Label>
 
           <Input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
+            className="w-full min-w-0"
           />
         </TextField>
 
         {/* Submit */}
         {showSubmitButton && (
           <div className="flex justify-center md:col-span-2">
-            <Button type="submit">Add Expense</Button>
+            <Button type="submit">
+              Add Expense
+            </Button>
           </div>
         )}
       </form>
