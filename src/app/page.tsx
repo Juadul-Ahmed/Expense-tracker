@@ -8,6 +8,7 @@ import ExpenseForm from "@/components/ExpenseForm";
 import ExpenseList from "@/components/ExpenseList";
 
 import { Expense } from "@/types/expense";
+import ExpenseChart from "@/components/ExpenseChart";
 
 export default function Home() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -66,6 +67,7 @@ export default function Home() {
           onUpdateExpense={handleUpdateExpense}
           editingExpense={editingExpense}
         />
+        <ExpenseChart expenses={expenses} />
 
         <ExpenseList
           expenses={expenses}
