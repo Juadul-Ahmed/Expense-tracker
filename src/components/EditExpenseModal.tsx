@@ -1,7 +1,6 @@
 "use client";
 
 import { Button, Modal } from "@heroui/react";
-
 import ExpenseForm from "./ExpenseForm";
 import { Expense } from "@/types/expense";
 
@@ -27,12 +26,14 @@ export default function EditExpenseModal({
         onOpenChange={onOpenChange}
         variant="blur"
       >
-        <Modal.Container>
-          <Modal.Dialog className="sm:max-w-[560px]">
+        <Modal.Container className="max-h-[90vh] overflow-y-auto">
+          <Modal.Dialog className="w-[calc(100vw-2rem)] max-w-[560px]">
             <Modal.CloseTrigger />
 
             <Modal.Header>
-              <Modal.Heading>Edit Expense</Modal.Heading>
+              <Modal.Heading>
+                Edit Expense
+              </Modal.Heading>
             </Modal.Header>
 
             <Modal.Body>
@@ -50,13 +51,15 @@ export default function EditExpenseModal({
             </Modal.Body>
 
             <Modal.Footer>
-              <Button variant="ghost" slot="close">
+              <Button
+                variant="secondary"
+                slot="close"
+              >
                 Cancel
               </Button>
 
               <Button
                 type="submit"
-              
                 form="edit-expense-form"
               >
                 Update Expense
