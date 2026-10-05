@@ -25,6 +25,8 @@ import ExpenseList from "@/components/ExpenseList";
 import EditExpenseModal from "@/components/EditExpenseModal";
 import ExpenseChart from "@/components/ExpenseChart";
 import ExpenseFilters from "@/components/ExpenseFilters";
+import LoadingState from "@/components/LoadingState";
+
 import { Expense } from "@/types/expense";
 
 export default function Home() {
@@ -39,10 +41,13 @@ export default function Home() {
   const [categoryFilter, setCategoryFilter] = useState<
     "All" | Expense["category"]
   >("All");
+
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  // Load expenses from MongoDB when the page opens
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load expenses from MongoDB
   useEffect(() => {
     async function loadData() {
       try {
@@ -51,6 +56,8 @@ export default function Home() {
         dispatch(loadExpenses(data));
       } catch (error) {
         console.error("Failed to load expenses:", error);
+      } finally {
+        setIsLoading(false);
       }
     }
 
@@ -107,6 +114,7 @@ export default function Home() {
     0,
   );
 
+  // Filter expenses
   const filteredExpenses = expenses.filter((expense) => {
     const matchesCategory =
       categoryFilter === "All" || expense.category === categoryFilter;
@@ -131,28 +139,38 @@ export default function Home() {
           editingExpense={null}
         />
 
-        <ExpenseChart expenses={expenses} />
+        {isLoading ? (
+          <LoadingState />
+        ) : (
+          <>
+            <ExpenseChart expenses={expenses} />
+            <ExpenseFilters
+              categoryFilter={categoryFilter}
+              onCategoryChange={setCategoryFilter}
+              startDate={startDate}
+              endDate={endDate}
+              onStartDateChange={setStartDate}
+              onEndDateChange={setEndDate}
+              onClearFilters={() => {
+                setCategoryFilter("All");
+                setStartDate("");
+                setEndDate("");
+              }}
+            />
+            <ExpenseList
+              expenses={filteredExpenses}
+              onEdit={handleEditExpense}
+              onDelete={handleDeleteExpense}
+            />
+          </>
+        )}
 
-        <ExpenseFilters
-          categoryFilter={categoryFilter}
-          onCategoryChange={setCategoryFilter}
-          startDate={startDate}
-          endDate={endDate}
-          onStartDateChange={setStartDate}
-          onEndDateChange={setEndDate}
-        />
         <EditExpenseModal
           isOpen={isEditModalOpen}
           expense={editingExpense}
           onOpenChange={setIsEditModalOpen}
           onAddExpense={handleAddExpense}
           onUpdateExpense={handleUpdateExpense}
-        />
-
-        <ExpenseList
-          expenses={filteredExpenses}
-          onEdit={handleEditExpense}
-          onDelete={handleDeleteExpense}
         />
       </div>
     </main>
