@@ -3,10 +3,14 @@ import ExpenseCard from "./ExpenseCard";
 
 type ExpenseListProps = {
   expenses: Expense[];
+  onEdit: (expense: Expense) => void;
+  onDelete: (id: string) => void;
 };
 
 export default function ExpenseList({
   expenses,
+  onEdit,
+  onDelete,
 }: ExpenseListProps) {
   return (
     <div className="rounded-xl bg-white p-6 shadow-sm">
@@ -37,6 +41,8 @@ export default function ExpenseList({
             <ExpenseCard
               key={expense.id}
               expense={expense}
+              onEdit={onEdit}
+              onDelete={onDelete}
             />
           ))}
         </div>

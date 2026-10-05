@@ -5,15 +5,30 @@ import { Expense } from "@/types/expense";
 
 type ExpenseFormProps = {
   onAddExpense: (expense: Expense) => void;
+  onUpdateExpense: (expense: Expense) => void;
+  editingExpense: Expense | null;
 };
 
 export default function ExpenseForm({
   onAddExpense,
+  onUpdateExpense,
+  editingExpense,
 }: ExpenseFormProps) {
-  const [title, setTitle] = useState("");
-  const [amount, setAmount] = useState("");
-  const [category, setCategory] = useState("");
-  const [date, setDate] = useState("");
+  const [title, setTitle] = useState(
+    editingExpense?.title ?? ""
+  );
+
+  const [amount, setAmount] = useState(
+    editingExpense?.amount.toString() ?? ""
+  );
+
+  const [category, setCategory] = useState(
+    editingExpense?.category ?? ""
+  );
+
+  const [date, setDate] = useState(
+    editingExpense?.date ?? ""
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,15 +38,22 @@ export default function ExpenseForm({
       return;
     }
 
-    const newExpense: Expense = {
-      id: crypto.randomUUID(),
+    const expenseData: Expense = {
+      id: editingExpense
+        ? editingExpense.id
+        : crypto.randomUUID(),
+
       title,
       amount: Number(amount),
       category: category as Expense["category"],
       date,
     };
 
-    onAddExpense(newExpense);
+    if (editingExpense) {
+      onUpdateExpense(expenseData);
+    } else {
+      onAddExpense(expenseData);
+    }
 
     setTitle("");
     setAmount("");
@@ -42,7 +64,7 @@ export default function ExpenseForm({
   return (
     <div className="mb-8 rounded-xl bg-white p-6 shadow-sm">
       <h2 className="mb-6 text-xl font-semibold text-gray-900">
-        Add Expense
+        {editingExpense ? "Edit Expense" : "Add Expense"}
       </h2>
 
       <form onSubmit={handleSubmit}>
@@ -59,7 +81,7 @@ export default function ExpenseForm({
               placeholder="e.g. Lunch"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className=" text-black w-full rounded-lg border border-gray-300 px-4 py-2.5 outline-none focus:border-black"
+              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-black outline-none focus:border-black"
             />
           </div>
 
@@ -74,7 +96,7 @@ export default function ExpenseForm({
               placeholder="e.g. 50"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="w-full text-black rounded-lg border border-gray-300 px-4 py-2.5 outline-none focus:border-black"
+              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-black outline-none focus:border-black"
             />
           </div>
 
@@ -87,7 +109,7 @@ export default function ExpenseForm({
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className=" text-black w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 outline-none focus:border-black"
+              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-black outline-none focus:border-black"
             >
               <option value="" disabled>
                 Select category
@@ -110,17 +132,16 @@ export default function ExpenseForm({
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full text-black rounded-lg border border-gray-300 px-4 py-2.5 outline-none focus:border-black"
+              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-black outline-none focus:border-black"
             />
           </div>
-
         </div>
 
         <button
           type="submit"
           className="mt-6 rounded-lg bg-black px-6 py-3 font-medium text-white transition hover:bg-gray-800"
         >
-          Add Expense
+          {editingExpense ? "Update Expense" : "Add Expense"}
         </button>
       </form>
     </div>
