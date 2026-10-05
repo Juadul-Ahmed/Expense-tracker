@@ -1,6 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import {
+  Button,
+  Input,
+  Label,
+  ListBox,
+  Select,
+  TextField,
+} from "@heroui/react";
+
 import { Expense } from "@/types/expense";
 
 type ExpenseFormProps = {
@@ -18,7 +27,7 @@ export default function ExpenseForm({
   editingExpense,
   variant = "card",
   showSubmitButton = true,
-  formId
+  formId,
 }: ExpenseFormProps) {
   const [title, setTitle] = useState(editingExpense?.title ?? "");
 
@@ -48,12 +57,12 @@ export default function ExpenseForm({
       onUpdateExpense(expenseData);
     } else {
       onAddExpense(expenseData);
-    }
 
-    setTitle("");
-    setAmount("");
-    setCategory("");
-    setDate("");
+      setTitle("");
+      setAmount("");
+      setCategory("");
+      setDate("");
+    }
   };
 
   return (
@@ -62,82 +71,98 @@ export default function ExpenseForm({
         variant === "card" ? "mb-8 rounded-xl bg-white p-6 shadow-sm" : ""
       }
     >
-      <h2 className="mb-6 text-xl font-semibold text-gray-900">
-        {editingExpense ? "Edit Expense" : "Add Expense"}
-      </h2>
+      {variant === "card" && (
+        <h2 className="mb-6 text-xl font-semibold text-gray-900">
+          Add Expense
+        </h2>
+      )}
 
-      <form id={formId} onSubmit={handleSubmit}>
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">
-              Title
-            </label>
+      <form
+        id={formId}
+        onSubmit={handleSubmit}
+        className="grid gap-5 md:grid-cols-2"
+      >
+        {/* Title */}
+        <TextField name="title" isRequired className="w-full">
+          <Label>Title</Label>
 
-            <input
-              type="text"
-              placeholder="e.g. Lunch"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-black outline-none focus:border-black"
-            />
-          </div>
+          <Input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="e.g. Lunch"
+          />
+        </TextField>
 
-          <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">
-              Amount
-            </label>
+        {/* Amount */}
+        <TextField name="amount" isRequired className="w-full">
+          <Label>Amount</Label>
 
-            <input
-              type="number"
-              placeholder="e.g. 50"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-black outline-none focus:border-black"
-            />
-          </div>
+          <Input
+            type="number"
+            min="0"
+            step="0.01"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder="e.g. 50"
+          />
+        </TextField>
 
-          <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">
-              Category
-            </label>
+        {/* Category */}
+        <Select
+          name="category"
+          value={category || null}
+          onChange={(value) => setCategory(value?.toString() ?? "")}
+          isRequired
+          className="w-full"
+        >
+          <Label>Category</Label>
 
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-black outline-none focus:border-black"
-            >
-              <option value="" disabled>
-                Select category
-              </option>
+          <Select.Trigger>
+            <Select.Value />
+            <Select.Indicator />
+          </Select.Trigger>
 
-              <option value="Food">Food</option>
-              <option value="Transport">Transport</option>
-              <option value="Shopping">Shopping</option>
-              <option value="Others">Others</option>
-            </select>
-          </div>
+          <Select.Popover>
+            <ListBox>
+              <ListBox.Item id="Food">
+                Food
+                <ListBox.ItemIndicator />
+              </ListBox.Item>
 
-          <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">
-              Date
-            </label>
+              <ListBox.Item id="Transport">
+                Transport
+                <ListBox.ItemIndicator />
+              </ListBox.Item>
 
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-black outline-none focus:border-black"
-            />
-          </div>
-        </div>
+              <ListBox.Item id="Shopping">
+                Shopping
+                <ListBox.ItemIndicator />
+              </ListBox.Item>
 
+              <ListBox.Item id="Others">
+                Others
+                <ListBox.ItemIndicator />
+              </ListBox.Item>
+            </ListBox>
+          </Select.Popover>
+        </Select>
+
+        {/* Date */}
+        <TextField name="date" isRequired className="w-full">
+          <Label>Date</Label>
+
+          <Input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+          />
+        </TextField>
+
+        {/* Submit */}
         {showSubmitButton && (
-          <button
-            type="submit"
-            className="mt-6 w-full rounded-lg bg-black px-6 py-3 font-medium text-white transition hover:bg-gray-800"
-          >
-            {editingExpense ? "Update Expense" : "Add Expense"}
-          </button>
+          <div className="flex justify-center md:col-span-2">
+            <Button type="submit">Add Expense</Button>
+          </div>
         )}
       </form>
     </div>

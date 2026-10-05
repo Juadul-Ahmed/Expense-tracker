@@ -56,7 +56,7 @@ export default function EditExpenseModal({
 
               <Button
                 type="submit"
-                variant="danger-soft"
+              
                 form="edit-expense-form"
               >
                 Update Expense
