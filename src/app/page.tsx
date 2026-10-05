@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState, AppDispatch } from "@/store/store";
+import { addExpense, updateExpense, deleteExpense } from "@/store/expenseSlice";
 import Header from "@/components/Header";
 import TotalExpense from "@/components/TotalExpense";
 import ExpenseForm from "@/components/ExpenseForm";
@@ -11,19 +13,19 @@ import { Expense } from "@/types/expense";
 import ExpenseChart from "@/components/ExpenseChart";
 
 export default function Home() {
-  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const dispatch = useDispatch<AppDispatch>();
+
+  const expenses = useSelector((state: RootState) => state.expenses.expenses);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   // Add expense
   const handleAddExpense = (expense: Expense) => {
-    setExpenses((currentExpenses) => [...currentExpenses, expense]);
+    dispatch(addExpense(expense));
   };
 
   // Delete expense
   const handleDeleteExpense = (id: string) => {
-    setExpenses((currentExpenses) =>
-      currentExpenses.filter((expense) => expense.id !== id),
-    );
+    dispatch(deleteExpense(id));
   };
 
   // Start editing
@@ -34,11 +36,7 @@ export default function Home() {
 
   // Update expense
   const handleUpdateExpense = (updatedExpense: Expense) => {
-    setExpenses((currentExpenses) =>
-      currentExpenses.map((expense) =>
-        expense.id === updatedExpense.id ? updatedExpense : expense,
-      ),
-    );
+    dispatch(updateExpense(updatedExpense));
 
     setEditingExpense(null);
     setIsEditModalOpen(false);
